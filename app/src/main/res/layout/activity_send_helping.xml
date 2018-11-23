@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#94339cff">
+
+
+    <!--<ImageView-->
+    <!--android:id="@+id/imageView"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--app:srcCompat="@drawable/i_white" />-->
+
+    <View
+        android:id="@+id/view3"
+        android:layout_width="276dp"
+        android:layout_height="265dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="136dp"
+        android:background="#fff" />
+
+
+    <Button
+        android:id="@+id/btnGuiHP"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="106dp"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/view3"
+        android:layout_alignTop="@+id/btnHuyGuiHP"
+        android:onClick="guiHelping"
+        android:text="Gửi" />
+
+    <Button
+        android:id="@+id/btnHuyGuiHP"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="105dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/view3"
+        android:layout_marginBottom="50dp"
+        android:onClick="huyGuiHelping"
+        android:text="Hủy" />
+
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="135dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        app:srcCompat="@drawable/logo" />
+
+    <EditText
+        android:id="@+id/editTextMsg"
+        android:layout_width="263dp"
+        android:layout_height="108dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="130dp"
+        android:layout_marginStart="61dp"
+        android:ems="10"
+        android:hint="Lời nhắn của bạn"
+        android:inputType="textPersonName"
+        android:selectAllOnFocus="false"
+        android:singleLine="false" />
+
+    <CheckBox
+        android:id="@+id/CBSuCo1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/editTextMsg"
+        android:layout_marginTop="143dp"
+        android:onClick="onCheckboxClicked"
+        android:layout_marginStart = "10dp"/>
+    <CheckBox
+        android:id="@+id/CBSuCo2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/editTextMsg"
+        android:layout_marginTop="190dp"
+        android:onClick="onCheckboxClicked"
+        android:layout_marginStart = "10dp"/>
+
+    <CheckBox
+        android:id="@+id/CBSuCo3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/editTextMsg"
+        android:layout_marginTop="240dp"
+        android:onClick="onCheckboxClicked"
+        android:layout_marginStart = "10dp"/>
+
+    <TextView
+        android:id="@+id/txtSuCo1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="149dp"
+        android:layout_marginStart = "110dp"
+        android:text="Sự cố 1" />
+    <TextView
+        android:id="@+id/txtSuCo2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="196dp"
+        android:layout_marginStart = "110dp"
+        android:text="Sự cố 2" />
+    <TextView
+        android:id="@+id/txtSuCo3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="246dp"
+        android:layout_marginStart = "110dp"
+        android:text="Sự cố 3" />
+</RelativeLayout>
+
