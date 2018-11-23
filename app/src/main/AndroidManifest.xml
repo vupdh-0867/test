@@ -47,16 +47,15 @@
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".ReceiveSOSActivity"></activity>
+        <activity android:name=".ReceiveSOSActivity" />
 
         <service
             android:name=".SOSService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
-        <activity android:name=".SendHelping">
-
-        </activity>
+        <activity android:name=".SendHelping"></activity>
+        <activity android:name=".HomeActivity"></activity>
     </application>
 
 </manifest>
