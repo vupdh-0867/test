@@ -7,6 +7,10 @@ public class User {
     Coordinate coordinate;
 
     public User() {
+        this.id = "";
+        this.name = "";
+        this.status = "";
+        this.coordinate = new Coordinate();
     }
 
     public User(String id, String name, Coordinate coordinate, String status) {

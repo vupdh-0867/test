@@ -24,15 +24,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import map.dtu.f4.sos_app.beans.Coordinate;
+import map.dtu.f4.sos_app.beans.Provider;
 import map.dtu.f4.sos_app.beans.User;
 
 public class SOSService extends Service implements LocationListener{
     LocationManager locationManager;
     DatabaseReference databaseReference;
-    User user;
-    Coordinate coordinate;
     String myStatus = "1";
 
     @Nullable
@@ -44,8 +45,6 @@ public class SOSService extends Service implements LocationListener{
     @Override
     public void onCreate() {
         super.onCreate();
-        user = new User();
-        coordinate = new Coordinate();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -53,37 +52,45 @@ public class SOSService extends Service implements LocationListener{
             return;
         }
         locationManager.requestLocationUpdates("gps",1000,0,this);
-        databaseReference.addValueEventListener(new ValueEventListener() {
+//        databaseReference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                String userId = Provider.me.getId();
+//                for(DataSnapshot user : dataSnapshot.child("UserLocation").getChildren())
+//                {
+//                    String id = user.getKey().toString();
+//                    if(!userId.equals(id)) {
+//                        double latitude = Double.parseDouble(user.child("coordinate").child("latitude").getValue().toString());
+//                        double longitude = Double.parseDouble(user.child("coordinate").child("longitude").getValue().toString());
+//                        String status = user.child("status").getValue().toString();
+//                        double distance = Math.sqrt(Math.pow(Provider.me.getCoordinate().getLatitude()-latitude,2)+Math.pow(Provider.me.getCoordinate().getLongitude()-longitude,2));
+//                        ArrayList<LatLng> vicCor = new ArrayList<>();
+//                        vicCor.add(new LatLng(Provider.me.getCoordinate().getLatitude(),Provider.me.getCoordinate().getLongitude()));
+//                        if((distance<(4.5*Math.pow(10,-3)))&myStatus.equals("1")&status.equals("3")) {
+//                            if(!checkInContact(dataSnapshot.child("InContact"),userId,id)) {
+//                                Toast.makeText(getApplicationContext(), "so is in danger", Toast.LENGTH_LONG).show();
+//                                vicCor.add(new LatLng(latitude, longitude));
+//                                Intent intent = new Intent(SOSService.this, ReceiveSOSActivity.class);
+//                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                                intent.putExtra("MyID", userId);
+//                                intent.putExtra("VictimID", id);
+//                                intent.putExtra("VictimCoor", vicCor);
+//                                startActivity(intent);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+        databaseReference.child("channel").child(Provider.me.getId()).child("victims").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                SharedPreferences sharedPreferences = getSharedPreferences("userInfor",Context.MODE_PRIVATE);
-                String userId = sharedPreferences.getString("id","null");
 
-
-                for(DataSnapshot user : dataSnapshot.child("UserLocation").getChildren())
-                {
-                    String id = user.getKey().toString();
-                    if(!userId.equals(id)) {
-                        double latitude = Double.parseDouble(user.child("coordinate").child("latitude").getValue().toString());
-                        double longitude = Double.parseDouble(user.child("coordinate").child("longitude").getValue().toString());
-                        String status = user.child("status").getValue().toString();
-                        double distance = Math.sqrt(Math.pow(coordinate.getLatitude()-latitude,2)+Math.pow(coordinate.getLongitude()-longitude,2));
-                        ArrayList<LatLng> vicCor = new ArrayList<>();
-                        vicCor.add(new LatLng(coordinate.getLatitude(),coordinate.getLongitude()));
-                        if((distance<(4.5*Math.pow(10,-3)))&myStatus.equals("1")&status.equals("3")) {
-                            if(!checkInContact(dataSnapshot.child("InContact"),userId,id)) {
-                                Toast.makeText(getApplicationContext(), "so is in danger", Toast.LENGTH_LONG).show();
-                                vicCor.add(new LatLng(latitude, longitude));
-                                Intent intent = new Intent(SOSService.this, ReceiveSOSActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                intent.putExtra("MyID", userId);
-                                intent.putExtra("VictimID", id);
-                                intent.putExtra("VictimCoor", vicCor);
-                                startActivity(intent);
-                            }
-                        }
-                    }
-                }
             }
 
             @Override
@@ -93,16 +100,6 @@ public class SOSService extends Service implements LocationListener{
         });
     }
 
-    boolean checkInContact(DataSnapshot dataSnapshot, String myID, String victimID){
-        for (DataSnapshot user : dataSnapshot.child("InContact").child(victimID).getChildren()){
-            if(user!=null) {
-                if (user.child("HelperID").getValue().toString().equals(myID))
-                    return true;
-            }
-            else return false;
-        }
-        return false;
-    }
 
     @Override
     public void onDestroy() {
@@ -112,33 +109,37 @@ public class SOSService extends Service implements LocationListener{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(getApplicationContext(),"aaa",Toast.LENGTH_LONG).show();
+        updateStatus();
         return START_STICKY;
 
     }
     private void updateLocation(User user){
         databaseReference.child("UserLocation").child(user.getId()).setValue(user);
     }
+    //ham cap nhat thong tin len db moi 10s
+    private void updateStatus(){
+        TimerTask timerTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                Date date;
+                date = new Date();
+                long time = date.getTime();
+                Provider.me.getCoordinate().setTime(time);
+                updateLocation(Provider.me);
+            }
+        };
+        Timer t = new Timer();
+        t.schedule(timerTask, 3,10000);// 10000 tuong ung voi 10 s
+    }
     @Override
     public void onLocationChanged(Location location) {
-        SharedPreferences sharedPreferences = getSharedPreferences("userInfor",Context.MODE_PRIVATE);
-        String id = sharedPreferences.getString("id","null");
-        String name = sharedPreferences.getString("name","null");
         double latitude = (double) location.getLatitude();
         double longitude = (double) location.getLongitude();
-        Date date;
-        date = new Date();
-        long time = date.getTime();
         //set thong tin ve toa do hien tai của nguoi dung
-        coordinate.setLatitude(latitude);
-        coordinate.setLongitude(longitude);
-        coordinate.setTime(time);
-        //set thong tin cho nguoi dung
-        user.setId(id);
-        user.setName(name);
-        user.setCoordinate(coordinate);
-        user.setStatus(myStatus);
-        //cập nhật thông tin về vị trí hiện tại của người dùng lên db
-        updateLocation(user);
+        Provider.me.getCoordinate().setLongitude(longitude);
+        Provider.me.getCoordinate().setLatitude(latitude);
         Toast.makeText(getApplicationContext(),"coordinate: "+latitude+"-"+longitude,Toast.LENGTH_LONG).show();
     }
 

@@ -48,6 +48,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import map.dtu.f4.sos_app.beans.Coordinate;
+import map.dtu.f4.sos_app.beans.Provider;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 
@@ -93,17 +96,13 @@ public class LoginActivity extends AppCompatActivity  {
                     String status = jsonObject.getString("status");
                     String msg = jsonObject.getString("msg");
                     if(status.equals("1")) {
-                        //sharepreference là lưu thông tin nguoi dùng để dùng trong app
-                        SharedPreferences sharedPreferences = getSharedPreferences("userInfor", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("id",UserId);
-                        editor.putString("name","VU");
-                        editor.putString("status",status);
-                        editor.apply();
+                        //dua du lieu vao bien static User-me
+                        Provider.me.setId(UserId);
+                        Provider.me.setName("VU");
                         //lam cho app (chay ngầm)
                         startService();
                         //chayj qua trang chur
-                        Intent intent = new Intent(LoginActivity.this, SendHelping.class);
+                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                         startActivity(intent);
                     }
                     else
