@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity  {
             public void onClick(View v) {
                 String email = txtEmail.getText().toString();
                 String matkhau = txtPassword.getText().toString();
-                dangNhap("http://xnam7799.000webhostapp.com/DangNhap.php",email,matkhau);
+                dangNhap("http://xnam7799.000webhostapp.com/dang-nhap-user",email,matkhau);
             }
         });
         registerLink.setOnClickListener(new View.OnClickListener() {

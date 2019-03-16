@@ -16,9 +16,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+
+import map.dtu.f4.sos_app.beans.Provider;
+import map.dtu.f4.sos_app.beans.Victim;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -53,35 +57,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 500);
             return;
         }
-        //mMap.setMyLocationEnabled(true);
+        mMap.setMyLocationEnabled(true);
         //LatLng myCoor = (LatLng) getIntent().getSerializableExtra("MyCoor");
 
-        ArrayList<LatLng> myList = (ArrayList<LatLng>) getIntent().getSerializableExtra("VictimCoor");
-        if(!myList.isEmpty()) {
-            LatLng myCoor = myList.get(0);
-            setMyLocation(myCoor);
-            setTargetLocations(myList);
+        LatLng myCoor = new LatLng(Provider.me.getCoordinate().getLatitude(),Provider.me.getCoordinate().getLongitude());
+        setMyLocation(myCoor);
+
+        if(!Provider.listVictim.isEmpty()){
+            for (Victim victim : Provider.listVictim){
+                setTargetLocations(new LatLng(victim.getCoordinate().getLatitude(),victim.getCoordinate().getLongitude()),victim.getMessage());
+            }
         }
     }
 
     private void setMyLocation(LatLng mycoord){
-        Bitmap icon = resizeMapIcons("myloca",8,8);
-        MarkerOptions mylocation = new MarkerOptions();
-        mylocation.position(mycoord);
-        mylocation.icon(BitmapDescriptorFactory.fromBitmap(icon));
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mycoord, 11);
+        //Bitmap icon = resizeMapIcons("myloca",50,50);
+        //MarkerOptions mylocation = new MarkerOptions();
+        //mylocation.position(mycoord);
+        //mylocation.icon(BitmapDescriptorFactory.fromBitmap(icon));
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mycoord, 16);
         mMap.animateCamera(cameraUpdate);
-        mMap.addMarker(mylocation);
+        //mMap.addMarker(mylocation);
     }
 
-    private void setTargetLocations(ArrayList<LatLng> locationList){
-        for (int i = 1; i < locationList.size(); i++) {
-            Bitmap icon = resizeMapIcons("targetloca",8,8);
+    private void setTargetLocations(LatLng location,String msg){
+            Bitmap icon = resizeMapIcons("targetloca",50,50);
             MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(locationList.get(i));
+            markerOptions.position(location);
+            markerOptions.title(msg);
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
-            mMap.addMarker(markerOptions);
-        }
+            Marker marker =  mMap.addMarker(markerOptions);
+            marker.showInfoWindow();
+
     }
 
     private Bitmap resizeMapIcons(String iconName, int width, int height){

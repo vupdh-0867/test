@@ -1,9 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".HomeActivity">
+<RelativeLayout
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#e9c047">
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="30dp"
+    android:layout_marginStart="150dp"
+        android:layout_marginTop="30dp"
+    android:textSize="21dp"
+    android:text="WELCOME Vu"
+    android:textStyle="bold"
+    />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="53dp"
+        android:textSize="17dp"
+        android:textStyle="italic"
+        android:text="Kinh độ"
+        />
+    <TextView
+        android:id="@+id/txtKinhDo"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="110dp"
+        android:layout_marginTop="53dp"
+        android:textSize="17dp"
+        android:text="108,154345"
+        android:textStyle="italic"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="214dp"
+        android:layout_marginTop="53dp"
+        android:textSize="17dp"
+        android:text="Vĩ độ"
+        android:textStyle="italic"
+        />
+    <TextView
+        android:id="@+id/txtViDo"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="255dp"
+        android:layout_marginTop="53dp"
+        android:textSize="17dp"
+        android:text="108,221345"
+        android:textStyle="italic"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="218dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="97dp"
+        android:background="#427989"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_marginStart="145dp"
+        android:layout_marginTop="100dp"
+        android:textSize="18dp"
+        android:text="VIET NAM"
+        android:textStyle="bold"
+        />
+
+    <ImageButton
+        android:id="@+id/btnSendSOS"
+        android:layout_width="110dp"
+        android:layout_height="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="11dp"
+        android:layout_marginTop="143dp"
+        android:src="@drawable/sos"
+        android:background="#e69e75"
+        android:onClick="sendSOS"/>
+
+    <ImageButton
+        android:id="@+id/btnSeeContact"
+        android:layout_width="110dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="143dp"
+        android:layout_marginStart="140dp"
+        android:src="@drawable/contact2"
+        android:background="#e69e75"
+        android:onClick="seeContact"/>
+    <ImageButton
+        android:id="@+id/btnSendSOSWithMsg"
+        android:layout_width="110dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="143dp"
+        android:layout_marginStart="270dp"
+        android:src="@drawable/textcontent"
+        android:background="#e69e75"
+        android:onClick="sendSOSWithText"/>
+    <TextView
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginStart="159dp"
+        android:textSize="18dp"
+        android:text="Liên Lạc"/>
+    <TextView
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginStart="31dp"
+        android:textSize="18dp"
+        android:text="Khẩn Cấp"/>
+    <TextView
+        android:layout_width="80dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginStart="300dp"
+        android:textSize="18dp"
+        android:text="Khác"/>
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="350dp"
+        android:layout_marginStart="120dp"
+        android:textStyle="italic"
+        android:textSize="18dp"
+        android:text="Để thiết lập tài khoản"
+        android:textColor="#1b1f83"/>
+
+    <ImageButton
+        android:id="@+id/btnSetting"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/setting" />
+</RelativeLayout>
