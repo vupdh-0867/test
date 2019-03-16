@@ -12,9 +12,12 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
+import map.dtu.f4.sos_app.beans.Provider;
+
 public class ReceiveSOSActivity extends AppCompatActivity {
     Button btnXem, btnHuy;
     ArrayList<LatLng> myList;
+    //DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,20 +28,17 @@ public class ReceiveSOSActivity extends AppCompatActivity {
         btnXem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-                String myID = getIntent().getStringExtra("MyID");
-                String victimID = getIntent().getStringExtra("VictimID");
-                //databaseReference.child("InContact").setValue(victimID);
-                databaseReference.child("InContact").child(victimID).child("HelperID").setValue(myID);
-                Intent intent = new Intent(getBaseContext(), MapsActivity.class);
-                intent.putExtra("VictimCoor",myList);
+//                for(victim :Provider.listVictim){
+//
+//                }
+                Intent intent = new Intent(ReceiveSOSActivity.this, MapsActivity.class);
                 startActivity(intent);
             }
         });
         btnHuy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                Intent intent = new Intent(getBaseContext(), HomeActivity.class);
                 startActivity(intent);
             }
         });

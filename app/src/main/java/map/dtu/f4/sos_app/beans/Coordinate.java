@@ -6,6 +6,9 @@ public class Coordinate {
     private long time;
 
     public Coordinate() {
+        this.latitude = 0;
+        this.longitude = 0;
+        this.time = 0;
     }
 
     public Coordinate(double latitude, double longitude, long time) {

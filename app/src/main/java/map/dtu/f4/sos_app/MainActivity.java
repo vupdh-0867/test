@@ -1,16 +1,12 @@
 package map.dtu.f4.sos_app;
 
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
+import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -23,44 +19,39 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import map.dtu.f4.sos_app.beans.Coordinate;
+import map.dtu.f4.sos_app.beans.Contact;
+import map.dtu.f4.sos_app.beans.Provider;
 import map.dtu.f4.sos_app.beans.User;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,LocationListener {
-    LocationManager locationManager;
+        implements NavigationView.OnNavigationItemSelectedListener {
     DatabaseReference databaseReference;
-    User user;
-    Coordinate coordinate;
-    String myStatus = "1";
+    ArrayList<String> listHelper ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        user = new User();
-        coordinate = new Coordinate();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(MainActivity.this, "First enable LOCATION ACCESS in settings.", Toast.LENGTH_LONG).show();
-            return;
-        }
-        locationManager.requestLocationUpdates("gps",1000,0,this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +60,6 @@ public class MainActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -78,8 +68,33 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-    }
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        listHelper = new ArrayList<>();
+        //khoi tao chanel neu chua co
+        databaseReference.child("channel").child(Provider.me.getId()).child("status").setValue("ok");
+        databaseReference.child("contacts").child(Provider.me.getId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Provider.listContact = new ArrayList<>();
+                for (DataSnapshot contact : dataSnapshot.getChildren()){
+                    String name = contact.child("name").getValue().toString();
+                    String sdt = contact.child("phone").getValue().toString();
+                    Provider.listContact.add(new Contact(name,sdt));
+                    Log.d("aaaa",Provider.listContact.get(0).toString());
+                }
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+    void sendSMS(String sdt){
+        String messageToSend = "Tôi đang gặp nguy hiểm tại http://www.google.com/maps/place/"+Provider.me.getCoordinate().getLatitude()+","+Provider.me.getCoordinate().getLongitude();
+        String number = sdt;
+        SmsManager.getDefault().sendTextMessage(number,null,messageToSend,null,null);
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -120,126 +135,105 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
+        } else if (id == R.id.nav_contact) {
+            Intent intent = new Intent(MainActivity.this,AddContactActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
-
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-    private void updateLocation(User user){
-        databaseReference.child("UserLocation").child(user.getId()).setValue(user);
-    }
-    @Override
-    public void onLocationChanged(Location location) {
-//        SharedPreferences sharedPreferences = getSharedPreferences("userInfor",Context.MODE_PRIVATE);
-//        String id = sharedPreferences.getString("id","null");
-//        String name = "vu";
-//        double latitude = (double) location.getLatitude();
-//        double longitude = (double) location.getLongitude();
-//        Date date;
-//        date = new Date();
-//        long time = date.getTime();
-//        coordinate.setLatitude(latitude);
-//        coordinate.setLongitude(longitude);
-//        coordinate.setTime(time);
-//        user.setId(id);
-//        user.setName(name);
-//        user.setCoordinate(coordinate);
-//        user.setStatus(myStatus);
-//        updateLocation(user);
-//        Toast.makeText(MainActivity.this,"coordinate: "+latitude+"-"+longitude,Toast.LENGTH_LONG).show();
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        databaseReference.child("UserLocation").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                SharedPreferences sharedPreferences = getSharedPreferences("userInfor",Context.MODE_PRIVATE);
-//                String userId = sharedPreferences.getString("id","null");
-//                for(DataSnapshot user : dataSnapshot.getChildren())
-//                {
-//                    String id = user.getKey().toString();
-//                    if(!userId.equals(id)) {
-//                        double latitude = Double.parseDouble(user.child("coordinate").child("latitude").getValue().toString());
-//                        double longitude = Double.parseDouble(user.child("coordinate").child("longitude").getValue().toString());
-//                        String status = user.child("status").getValue().toString();
-//                        double distance = Math.sqrt(Math.pow(coordinate.getLatitude()-latitude,2)+Math.pow(coordinate.getLongitude()-longitude,2));
-//                        ArrayList<LatLng> vicCor = new ArrayList<>();
-//                        vicCor.add(new LatLng(coordinate.getLatitude(),coordinate.getLongitude()));
-//                        if((distance<(4.5*Math.pow(10,-3)))&myStatus.equals("1")&status.equals("3")) {
-//                            Toast.makeText(MainActivity.this, "so is in danger", Toast.LENGTH_LONG).show();
-//                            vicCor.add(new LatLng(latitude,longitude));
-//                            Intent intent = new Intent(getBaseContext(), ReceiveSOSActivity.class);
-//                            intent.putExtra("VictimCoor",vicCor);
-//                            startActivity(intent);
-//                        }
-//
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
+
+
+    private void updateDangerLocationToServer(){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "http://xnam7799.000webhostapp.com/luu-hoat-dong", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+               Log.d("updatelocal","update success");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("updatelocal","update failed");
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Log.d("updatelocal","location updating");
+                Date d = new Date();
+                HashMap<String, String> params = new HashMap<>();
+                params.put("NguoiDung", Provider.me.getId());
+                params.put("KinhDo", Provider.me.getCoordinate().getLatitude()+"");
+                params.put("ViDo", Provider.me.getCoordinate().getLongitude()+"");
+                params.put("ThoiGian", d.toString());
+                params.put("NoiDung", "");
+                return params;
+            }
+        };
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
     }
 
     @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event){
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(keyCode==KeyEvent.KEYCODE_VOLUME_DOWN){
             event.startTracking();
             return true;
         }
-        return super.onKeyDown(keyCode,event);
+        return super.onKeyDown(keyCode, event);
     }
-
+    //su kien giu nut giam am luong
     @Override
     public boolean onKeyLongPress(int keyCode, KeyEvent event) {
         if(keyCode==KeyEvent.KEYCODE_VOLUME_DOWN){
-            SharedPreferences sharedPreferences = getSharedPreferences("userInfor",Context.MODE_PRIVATE);
-            String id = sharedPreferences.getString("id","null");
-            if(myStatus.equals("1")){
-                databaseReference.child("UserLocation").child(id).child("status").setValue("3");
-                databaseReference.child("UserLocation").child(id).child("message").setValue("Đang gặp nguy hiểm!");
-                //databaseReference.child("InContact").setValue(id);
-                myStatus = "3";
+            updateDangerLocationToServer();
+            databaseReference.child("UserLocation").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    User me = Provider.me;
+                    for(DataSnapshot user : dataSnapshot.getChildren()) {
+                        //tim nguoi xung quanh 100m
+                        if (user.child("coordinate").child("latitude").getValue() != null && user.child("coordinate").child("longitude").getValue()!=null){
+                            String id = user.getKey().toString();
+                            double latitude = Double.parseDouble(user.child("coordinate").child("latitude").getValue().toString());
+                            double longitude = Double.parseDouble(user.child("coordinate").child("longitude").getValue().toString());
+                            double distance = Math.sqrt(Math.pow(me.getCoordinate().getLatitude() - latitude, 2) + Math.pow(me.getCoordinate().getLongitude() - longitude, 2));
+                            Log.d("vuPhan", distance + "");
+                            //neu khoang cach < 100 va khong phai minh
+                            if (distance < (4.5 * Math.pow(10, -3)) & !id.equals(me.getId())) {
+                                listHelper.add(id);
+                            }
+                        }
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+            Log.d("updatelocal","location updating");
+            for(String id : listHelper){
+                User me = Provider.me;
+                Map data = new HashMap<>();
+                //databaseReference.child("channel").child(id).child("victims").child("v-"+me.getId()).child("").setValue();
+                data.put("VictimId",me.getId());
+                data.put("VictimName",me.getName());
+                data.put("VicTimLatitude",me.getCoordinate().getLatitude());
+                data.put("VicTimLongitude",me.getCoordinate().getLongitude());
+                data.put("SendTime",me.getCoordinate().getTime());
+                data.put("VictimMessage","Đang gặp nguy hiểm");
+                data.put("Seen","false");
+                databaseReference.child("channel").child(id).child("victims").child("v-"+me.getId()).setValue(data);
             }
-            else{
-                databaseReference.child("UserLocation").child(id).child("status").setValue("1");
-                databaseReference.child("UserLocation").child(id).child("message").setValue("null");
-                databaseReference.child("InContact").child(id).removeValue();
-                myStatus = "1";
-            }
-            Toast.makeText(MainActivity.this,"oke"+myStatus.toString(),Toast.LENGTH_LONG).show();
             return true;
         }
-        return super.onKeyLongPress(keyCode, event);
+        return onKeyLongPress(keyCode,event);
     }
 }
